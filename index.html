@@ -3,28 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer</title>
+    <title>Responsive PDF Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            margin: 20px 0;
+        }
         #pdf-container {
             width: 100%;
             height: 100vh;
-            overflow-y: scroll;
+            overflow-y: auto;
             border: 1px solid #ddd;
+            background: white;
         }
         canvas {
             display: block;
-            margin: 0 auto;
+            margin: 10px auto;
+            width: 100% !important; /* Ensures the canvas is responsive */
+            height: auto !important; /* Maintains aspect ratio */
         }
     </style>
 </head>
 <body>
-    <h1>PDF Viewer</h1>
+
+    <h1>Responsive PDF Viewer</h1>
     <div id="pdf-container"></div>
 
     <script>
-        var url = 'case-study1.pdf'; // Ensure this is correct
-
+        var url = 'case-study1.pdf'; // Ensure the PDF is in the same directory as index.html
         var pdfContainer = document.getElementById('pdf-container');
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -36,7 +49,11 @@
                     pdfContainer.appendChild(canvas);
 
                     var context = canvas.getContext('2d');
-                    var viewport = page.getViewport({ scale: 1.5 });
+
+                    // ✅ Dynamically adjust scale for responsiveness
+                    var scaleFactor = getScaleFactor();
+                    var viewport = page.getViewport({ scale: scaleFactor });
+
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
@@ -46,6 +63,20 @@
         }).catch(function(error) {
             console.error("Error loading PDF:", error);
         });
+
+        function getScaleFactor() {
+            // ✅ Adjust scale dynamically based on screen width
+            if (window.innerWidth <= 480) {
+                return 0.6; // Smaller scale for mobile
+            } else if (window.innerWidth <= 768) {
+                return 0.8; // Medium scale for tablets
+            }
+            return 1.5; // Default for desktops
+        }
+
+        // ✅ Reload on resize to recalculate scale
+        window.addEventListener('resize', () => location.reload());
     </script>
+
 </body>
 </html>
